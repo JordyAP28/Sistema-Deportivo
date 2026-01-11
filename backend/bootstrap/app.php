@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,15 +13,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Configurar CORS aquí
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
-        
-        // Middleware para API
-        $middleware->api(prepend: [
+
+        // Agregar middleware CORS global
+        $middleware->use([
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+
+        // Usar la clase de middleware para CORS
+        $middleware->prepend(\App\Http\Middleware\CorsMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

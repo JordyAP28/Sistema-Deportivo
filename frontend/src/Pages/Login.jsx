@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
-import '../styles/public/registro.css';
-
+import '../styles/Login.css';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -12,58 +12,81 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
-    setError('');
-    setLoading(true);
+  setError('');
+  setLoading(true);
 
-    try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
-      });
+  try {
+    console.log('Enviando datos:', formData);
+    
+    const response = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      // Quita credentials por ahora para probar
+      // credentials: 'include',
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password
+      }),
+    });
 
-      const data = await response.json();
+    console.log('Status:', response.status);
+    
+    const data = await response.json();
+    console.log('Respuesta API:', data);
 
-      if (data.success) {
-        // Guardar el token en localStorage
-        localStorage.setItem('auth_token', data.data.token);
-        
-        // Guardar datos del usuario
-        localStorage.setItem('user', JSON.stringify(data.data.usuario));
-        
-        setSuccess(true);
-        
-        // Aquí puedes redirigir al dashboard o actualizar el estado global
-        console.log('Login exitoso:', data.data);
-        
-        // Simular redirección (en tu app real usarías React Router)
-        setTimeout(() => {
-          alert('¡Login exitoso! Token guardado en localStorage');
-        }, 500);
-        
-      } else {
-        setError(data.message || 'Credenciales inválidas');
+    if (response.ok) {
+      localStorage.setItem('auth_token', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.usuario));
+      
+      const userRole = data.data.usuario.id_rol;
+      
+      switch(userRole) {
+        case 1:
+          navigate('/Admin/Dashboard');
+          break;
+        case 2:
+          navigate('/Deportista/Dashboard');
+          break;
+        case 3:
+          navigate('/Secretario/Dashboard');
+          break;
+        default:
+          navigate('/');
       }
-    } catch (err) {
-      setError('Error de conexión. Verifica que tu API esté corriendo.');
-      console.error('Error:', err);
-    } finally {
-      setLoading(false);
+      
+    } else {
+      setError(data.message || `Error ${response.status}: ${response.statusText}`);
     }
-  };
+  } catch (err) {
+    console.error('Error completo:', err);
+    setError(`Error de conexión: ${err.message}. Verifica que tu API esté corriendo en ${API_URL}.`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleLogin();
+    }
+  };
+
+  // Para pruebas rápidas - quita esto en producción
+  const fillTestCredentials = (role) => {
+    const testAccounts = {
+      1: { email: 'admin@test.com', password: 'password123' },
+      2: { email: 'deportista@test.com', password: 'password123' },
+      3: { email: 'secretario@test.com', password: 'password123' }
+    };
+    
+    if (testAccounts[role]) {
+      setFormData(testAccounts[role]);
     }
   };
 
@@ -80,6 +103,28 @@ const Login = () => {
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
             <p className="text-gray-600">Bienvenido de nuevo</p>
+            
+            {/* Botones de prueba - Quita en producción */}
+            <div className="mt-4 flex gap-2 justify-center">
+              <button 
+                onClick={() => fillTestCredentials(1)}
+                className="text-xs px-3 py-1 bg-red-100 text-red-700 rounded-full hover:bg-red-200"
+              >
+                Admin Test
+              </button>
+              <button 
+                onClick={() => fillTestCredentials(2)}
+                className="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full hover:bg-green-200"
+              >
+                Deportista Test
+              </button>
+              <button 
+                onClick={() => fillTestCredentials(3)}
+                className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200"
+              >
+                Secretario Test
+              </button>
+            </div>
           </div>
 
           {/* Mensaje de Error */}
@@ -90,23 +135,6 @@ const Login = () => {
                 <div>
                   <p className="text-red-800 font-medium text-sm">Error de autenticación</p>
                   <p className="text-red-700 text-sm mt-1">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Mensaje de Éxito */}
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-green-800 font-medium text-sm">¡Inicio de sesión exitoso!</p>
-                  <p className="text-green-700 text-sm mt-1">Redirigiendo al dashboard...</p>
                 </div>
               </div>
             </div>
@@ -153,17 +181,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Recordarme y Olvidé mi contraseña */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500" />
-                <span className="text-gray-600">Recordarme</span>
-              </label>
-              <button className="text-blue-600 hover:text-blue-700 font-medium transition">
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-
             {/* Botón de Login */}
             <button
               onClick={handleLogin}
@@ -184,35 +201,16 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">o continúa con</span>
-            </div>
-          </div>
-
-
-
-          {/* Footer - Link a Registro */}
+          {/* Footer */}
           <div className="mt-8 text-center">
             <span className="text-gray-600">¿No tienes una cuenta? </span>
-            <button className="text-blue-600 font-semibold hover:text-blue-700 transition">
+            <button 
+              className="text-blue-600 font-semibold hover:text-blue-700 transition"
+              onClick={() => navigate('/registro')}
+            >
               Regístrate gratis
             </button>
           </div>
-        </div>
-
-        {/* Info adicional */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            Al iniciar sesión, aceptas nuestros{' '}
-            <button className="text-blue-600 hover:underline">Términos de Servicio</button>
-            {' '}y{' '}
-            <button className="text-blue-600 hover:underline">Política de Privacidad</button>
-          </p>
         </div>
       </div>
     </div>

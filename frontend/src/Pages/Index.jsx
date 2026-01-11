@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/public/index.css";
+import "../styles/index.css";
 
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);

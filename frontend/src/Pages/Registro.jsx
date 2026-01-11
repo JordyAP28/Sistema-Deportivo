@@ -4,13 +4,13 @@ import {
   CheckCircle, Loader, Eye, EyeOff, ArrowRight, Info,
   ChevronDown, ExternalLink
 } from 'lucide-react';
-import '../styles/public/registro.css';
+import '../styles/registro.css';
 
 const API_URL = 'http://localhost:8000/api';
 
 const Registro = () => {
   const [formData, setFormData] = useState({
-    id_rol: '1',
+    id_rol: '3', // Valor por defecto para "Usuario Regular"
     nombre: '',
     apellido: '',
     email: '',
@@ -364,26 +364,7 @@ const Registro = () => {
                 )}
               </div>
 
-              {/* Rol */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Tipo de cuenta
-                </label>
-                <div className="relative group">
-                  <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-purple-500 transition-colors z-10" />
-                  <select
-                    className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all duration-200 text-gray-800 appearance-none cursor-pointer group-hover:border-purple-300"
-                    value={formData.id_rol}
-                    onChange={(e) => handleInputChange('id_rol', e.target.value)}
-                    disabled={loading}
-                  >
-                    <option value="1">Usuario Regular</option>
-                    <option value="2">Administrador</option>
-                    <option value="3">Moderador</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                </div>
-              </div>
+
 
               {/* Contraseña */}
               <div className="space-y-2">

@@ -55,8 +55,8 @@ Route::get('/health', function () {
 
 // Autenticación
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
 
+Route::post('/login', [AuthController::class, 'login']);
 // ============================================
 // RUTAS PROTEGIDAS (REQUIEREN AUTENTICACIÓN)
 // ============================================
@@ -107,8 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ==========================================
     // RUTAS ADMINISTRATIVAS (Solo Admin/Secretaria)
     // ==========================================
-    Route::middleware('can:admin-o-secretaria')->group(function () {
-        
+
         // Escritura de Usuarios (solo admin)
         Route::post('/usuarios', [UsuarioController::class, 'store']);
         Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
@@ -140,7 +139,6 @@ Route::middleware('auth:sanctum')->group(function () {
             'asistencias' => AsistenciaController::class,
         ]);
     });
-});
 
 // ============================================
 // RUTA DE FALLBACK (404)
