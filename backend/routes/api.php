@@ -7,15 +7,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
 */
-
-// Simple healthcheck for API
-Route::get('/health', function () {
-    return response()->json(['status' => 'ok']);
-});
 
 // Import controllers
 use App\Http\Controllers\ActividadController;
@@ -48,16 +40,54 @@ use App\Http\Controllers\RolPermisoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\AuthController;
 
-// Rutas públicas de autenticación
-Route::post('auth/register', [AuthController::class, 'register']);
-Route::post('auth/login', [AuthController::class, 'login']);
+// ============================================
+// RUTAS PÚBLICAS (SIN AUTENTICACIÓN)
+// ============================================
 
-// Agrupar rutas API protegidas: requiere usuario autenticado por Sanctum
+// Healthcheck
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now(),
+        'service' => 'Sistema Deportivo API'
+    ]);
+});
+
+// Autenticación
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// ============================================
+// RUTAS PROTEGIDAS (REQUIEREN AUTENTICACIÓN)
+// ============================================
+
 Route::middleware('auth:sanctum')->group(function () {
-    // Perfil del usuario autenticado y logout
-    Route::get('auth/me', [AuthController::class, 'me']);
-    Route::post('auth/logout', [AuthController::class, 'logout']);
-    // Rutas generales para usuarios autenticados
+    
+    // ==========================================
+    // AUTENTICACIÓN
+    // ==========================================
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // ==========================================
+    // PERFIL DE USUARIO (Cualquier usuario autenticado)
+    // ==========================================
+    Route::put('/perfil', [UsuarioController::class, 'actualizarPerfil']);
+    
+    // ==========================================
+    // USUARIOS (Lectura para todos, escritura solo admin)
+    // ==========================================
+    // Rutas de lectura (cualquier usuario autenticado puede ver)
+    Route::get('/usuarios', [UsuarioController::class, 'index']);
+    Route::get('/usuarios/{id}', [UsuarioController::class, 'show']);
+    Route::get('/usuarios/rol/{idRol}', [UsuarioController::class, 'porRol']);
+    Route::get('/usuarios/estado/{estado}', [UsuarioController::class, 'porEstado']);
+    Route::post('/usuarios/buscar', [UsuarioController::class, 'buscar']);
+    Route::get('/usuarios/estadisticas/general', [UsuarioController::class, 'estadisticas']);
+    
+    // ==========================================
+    // RECURSOS GENERALES (Todos los usuarios autenticados)
+    // ==========================================
     Route::apiResources([
         'inscripciones-curso' => InscripcionCursoController::class,
         'archivos' => ArchivoController::class,
@@ -66,16 +96,27 @@ Route::middleware('auth:sanctum')->group(function () {
         'estadisticas-jugador' => EstadisticaJugadorController::class,
     ]);
 
-    // Notificaciones: propietarios y admin/secretaria pueden gestionarlas
+    // ==========================================
+    // NOTIFICACIONES
+    // ==========================================
     Route::apiResource('notificaciones', NotificacionController::class);
     Route::post('notificaciones/{id}/marcar-leida', [NotificacionController::class, 'marcarLeida']);
     Route::post('notificaciones/marcar-todas-leidas', [NotificacionController::class, 'marcarTodasLeidas']);
     Route::get('notificaciones-no-leidas', [NotificacionController::class, 'noLeidas']);
 
-    // Rutas administrativas (admin o secretaria)
+    // ==========================================
+    // RUTAS ADMINISTRATIVAS (Solo Admin/Secretaria)
+    // ==========================================
     Route::middleware('can:admin-o-secretaria')->group(function () {
+        
+        // Escritura de Usuarios (solo admin)
+        Route::post('/usuarios', [UsuarioController::class, 'store']);
+        Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
+        Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
+        Route::post('/usuarios/{id}/restore', [UsuarioController::class, 'restore']);
+        
+        // Otros recursos administrativos
         Route::apiResources([
-            'usuarios' => UsuarioController::class,
             'roles' => RolController::class,
             'permisos' => PermisoController::class,
             'rol-permisos' => RolPermisoController::class,
@@ -99,4 +140,20 @@ Route::middleware('auth:sanctum')->group(function () {
             'asistencias' => AsistenciaController::class,
         ]);
     });
+});
+
+// ============================================
+// RUTA DE FALLBACK (404)
+// ============================================
+Route::fallback(function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'Ruta no encontrada. Verifica el endpoint.',
+        'available_endpoints' => [
+            'POST /api/register',
+            'POST /api/login',
+            'GET /api/me (requiere auth)',
+            'GET /api/usuarios (requiere auth)',
+        ]
+    ], 404);
 });
