@@ -1,0 +1,329 @@
+/* admin/facturas.css */
+
+/* Estilos específicos para facturas */
+
+/* Estados de factura */
+.estado-badge {
+  font-size: 0.75em;
+  padding: 0.25em 0.75em;
+  border-radius: 50px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.estado-pendiente {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.estado-pagada {
+  background-color: #198754;
+  color: white;
+}
+
+.estado-vencida {
+  background-color: #dc3545;
+  color: white;
+}
+
+.estado-anulada {
+  background-color: #6c757d;
+  color: white;
+}
+
+.estado-parcial {
+  background-color: #0dcaf0;
+  color: #212529;
+}
+
+/* Facturas table */
+.table td, .table th {
+  vertical-align: middle;
+}
+
+/* Monetary values */
+.monetary-positive {
+  color: #198754;
+  font-weight: bold;
+}
+
+.monetary-negative {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.monetary-zero {
+  color: #6c757d;
+}
+
+/* Invoice print view */
+.invoice-print {
+  background: white;
+  padding: 30px;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+}
+
+.invoice-header {
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.invoice-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #0d6efd;
+  margin-bottom: 10px;
+}
+
+.invoice-header .lead {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.invoice-details, .invoice-totals, .invoice-notes {
+  margin-bottom: 30px;
+}
+
+.invoice-footer {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Stats cards for invoices */
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #e9ecef;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.stat-card h4 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.stat-card p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.stat-card-lg {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #e9ecef;
+}
+
+/* Form controls específicos */
+.currency-input-group .input-group-text {
+  background-color: #f8f9fa;
+  font-weight: 500;
+}
+
+/* Filter section */
+.filters-section {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .invoice-print {
+    padding: 15px;
+  }
+  
+  .invoice-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .invoice-header .lead {
+    font-size: 1rem;
+  }
+  
+  .btn-group {
+    flex-wrap: wrap;
+  }
+  
+  .btn-group .btn {
+    margin-bottom: 5px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .invoice-print {
+    border: none;
+    padding: 0;
+  }
+  
+  .modal-header,
+  .modal-footer,
+  .btn,
+  .filters-section,
+  .stats-section {
+    display: none !important;
+  }
+  
+  .modal-content {
+    box-shadow: none;
+    border: none;
+  }
+  
+  .modal-body {
+    padding: 0;
+  }
+}
+
+/* Badge styles for payment methods */
+.badge-efectivo {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-tarjeta {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge-transferencia {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.badge-cheque {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.badge-deposito {
+  background-color: #20c997;
+  color: white;
+}
+
+/* Payment status */
+.payment-status {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.payment-status.completado {
+  background-color: #28a745;
+}
+
+.payment-status.pendiente {
+  background-color: #ffc107;
+}
+
+.payment-status.cancelado {
+  background-color: #dc3545;
+}
+
+/* Animation for new invoices */
+@keyframes highlightNew {
+  0% { background-color: rgba(13, 110, 253, 0.1); }
+  100% { background-color: transparent; }
+}
+
+.highlight-new {
+  animation: highlightNew 2s ease;
+}
+
+/* Loading overlay for invoices */
+.loading-invoice {
+  position: relative;
+  min-height: 200px;
+}
+
+.loading-invoice::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+/* Form validation styles */
+.is-invalid-amount {
+  border-color: #dc3545;
+}
+
+.is-valid-amount {
+  border-color: #198754;
+}
+
+/* Totals summary */
+.totals-summary {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+}
+
+.totals-summary .total-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.totals-summary .total-item:last-child {
+  border-bottom: none;
+}
+
+.totals-summary .total-item.total-grand {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #198754;
+}
+
+/* Invoice line items */
+.invoice-line-item {
+  padding: 10px;
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s ease;
+}
+
+.invoice-line-item:hover {
+  background-color: #f8f9fa;
+}
+
+.invoice-line-item:last-child {
+  border-bottom: none;
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}

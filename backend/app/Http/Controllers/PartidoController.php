@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use app\Models\Usuario;
 use App\Models\Partido;
 use App\Models\Campeonato;
 use App\Models\Club;

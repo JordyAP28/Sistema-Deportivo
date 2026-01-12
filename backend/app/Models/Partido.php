@@ -68,4 +68,15 @@ class Partido extends Model
     {
         return $this->hasMany(EstadisticaJugador::class, 'id_partido', 'id_partido');
     }
+
+    // RELACIONES CORREGIDAS: Usa 'Usuario' en lugar de 'User'
+    public function usuarioCreador()
+    {
+        return $this->belongsTo(Usuario::class, 'created_by', 'id_usuario');
+    }
+
+    public function usuarioActualizador()
+    {
+        return $this->belongsTo(Usuario::class, 'updated_by', 'id_usuario');
+    }
 }
